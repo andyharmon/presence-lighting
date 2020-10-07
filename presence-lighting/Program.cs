@@ -43,6 +43,7 @@ namespace presence_lighting
                 Console.WriteLine("Please choose one of the following options:");
                 Console.WriteLine("0. Exit");
                 Console.WriteLine("1. Display access token");
+                Console.WriteLine("2. Display User's current presence");
 
                 try
                 {
@@ -67,10 +68,33 @@ namespace presence_lighting
                         Console.WriteLine($"Access token: {accessToken}\n");
                         choice = -1;
                         break;
+
+                    case 2:
+                        // Display user's current presence
+                        Console.WriteLine($"{user.DisplayName} is currently {GetPresence()}");
+                        choice = -1;
+                        break;
+
+                    default:
+                        Console.WriteLine("Invalid Choice! Please try again");
+                        choice = -1;
+                        break;
                 }
 
             }
 
+            static string GetPresence()
+            {
+                var presence = GraphHelper.GetMePresenceAsync().Result;
+                if (presence != null)
+                {
+                    return presence.Availability;
+                }
+                else
+                {
+                    return "not found";
+                }
+            }
 
             static IConfigurationRoot LoadAppSettings()
             {
