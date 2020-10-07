@@ -351,3 +351,5 @@ MigrationBackup/
 
 # Remove local .vscode files
 .vscode
+
+*.csproj
