@@ -1,10 +1,12 @@
 using Q42.HueApi;
 using Q42.HueApi.Interfaces;
 using Q42.HueApi.Models.Bridge;
+using Q42.HueApi.ColorConverters.Original;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Q42.HueApi.ColorConverters;
 
 namespace presence_lighting.Helpers
 {
@@ -17,9 +19,26 @@ namespace presence_lighting.Helpers
 
         public static void Initialise(string hueAppKey, string userIp)
         {
-            hueClient = GetClient().Result;
             _hueKey = hueAppKey;
             _userIp = userIp;
+            hueClient = GetClient().Result;
+        }
+
+        public static void UpdatePresence(string presence)
+        {
+            /*
+             * For now, set colour as red for a brief period and then
+             * return to colour as previous.
+             */
+
+            var lightState = hueClient.GetLightAsync("1").Result.State;
+
+            var command = new LightCommand();
+            command.TurnOn().SetColor(new RGBColor("cf190c")); // teams red
+            command.Alert = Alert.Multiple;
+
+            hueClient.SendCommandAsync(command, new List<string> { "1" });
+
         }
 
         static async Task<LocalHueClient> GetClient()
@@ -34,7 +53,7 @@ namespace presence_lighting.Helpers
             client = new LocalHueClient(ip);
             client.Initialize(_hueKey); // Get app key from config
 
-            if(!client.IsInitialized)
+            if (!client.IsInitialized)
             {
                 return null;
             }
@@ -46,12 +65,12 @@ namespace presence_lighting.Helpers
         {
             string ip = _userIp; // get ip from config
 
-            if(string.IsNullOrEmpty(ip))
+            if (string.IsNullOrEmpty(ip))
             {
                 IBridgeLocator locator = new HttpBridgeLocator();
                 IEnumerable<LocatedBridge> bridges = await locator.LocateBridgesAsync(TimeSpan.FromSeconds(5));
 
-                if(bridges.Any())
+                if (bridges.Any())
                 {
                     ip = bridges.First().IpAddress;
                     Console.WriteLine($"Bridge has been found at {ip}");

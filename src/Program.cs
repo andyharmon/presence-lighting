@@ -127,6 +127,7 @@ namespace presence_lighting
                         if (currentPresence != previousPresence)
                         {
                             Console.WriteLine($"User is now {currentPresence}");
+                            HueHelper.UpdatePresence(currentPresence);
                         }
                         previousPresence = currentPresence;
                         Thread.Sleep(5000); // Loop every 5 second until input is entered.
