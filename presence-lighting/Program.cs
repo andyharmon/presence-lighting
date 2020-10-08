@@ -3,6 +3,7 @@ using presence_lighting.Graph;
 using System.Collections.Generic;
 using System;
 using Microsoft.Extensions.Configuration;
+using System.Threading;
 
 namespace presence_lighting
 {
@@ -44,6 +45,7 @@ namespace presence_lighting
                 Console.WriteLine("0. Exit");
                 Console.WriteLine("1. Display access token");
                 Console.WriteLine("2. Display User's current presence");
+                Console.WriteLine("3. Monitor Presence");
 
                 try
                 {
@@ -75,6 +77,13 @@ namespace presence_lighting
                         choice = -1;
                         break;
 
+                    case 3:
+                        // Monitor presence
+                        Console.WriteLine($"{user.DisplayName}'s presence will be monitored");
+                        MonitorPresence();
+                        choice = -1;
+                        break;
+
                     default:
                         Console.WriteLine("Invalid Choice! Please try again");
                         choice = -1;
@@ -95,6 +104,24 @@ namespace presence_lighting
                     return "not found";
                 }
             }
+
+            static void MonitorPresence()
+            {
+                ConsoleKeyInfo cki;
+                do
+                {
+                    Console.WriteLine("\nDisplaying user presence, press the 'x' key to quit.");
+                    while (Console.KeyAvailable == false)
+                    {
+                        Console.WriteLine($"User is currently {GetPresence()}");
+                        Thread.Sleep(5000); // Loop every 5 second until input is entered.
+                    }
+
+                    cki = Console.ReadKey(true);
+                    Console.WriteLine("Exiting...\n");
+                } while (cki.Key != ConsoleKey.X);
+            }
+
 
             static IConfigurationRoot LoadAppSettings()
             {
