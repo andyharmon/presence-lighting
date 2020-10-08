@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Q42.HueApi.ColorConverters;
+using System.Threading;
 
 namespace presence_lighting.Helpers
 {
@@ -17,6 +18,9 @@ namespace presence_lighting.Helpers
         private static string _hueKey;
         private static string _userIp;
 
+        private const string TeamsRed = "c4314b";
+        private const string TeamsGreen = "#92c353";
+
         public static void Initialise(string hueAppKey, string userIp)
         {
             _hueKey = hueAppKey;
@@ -24,7 +28,7 @@ namespace presence_lighting.Helpers
             hueClient = GetClient().Result;
         }
 
-        public static void UpdatePresence(string presence)
+        public static void SetLights(string presence)
         {
             /*
              * For now, set colour as red for a brief period and then
@@ -34,11 +38,28 @@ namespace presence_lighting.Helpers
             var lightState = hueClient.GetLightAsync("1").Result.State;
 
             var command = new LightCommand();
-            command.TurnOn().SetColor(new RGBColor("cf190c")); // teams red
-            command.Alert = Alert.Multiple;
+
+
+            if (presence == "Available")
+            {
+                command.TurnOn().SetColor(new RGBColor(TeamsGreen));
+                hueClient.SendCommandAsync(command, new List<string> { "1" });
+            }
+
+            if (presence == "Busy" || presence == "DoNotDisturb")
+            {
+                command.TurnOn().SetColor(new RGBColor(TeamsRed));
+                hueClient.SendCommandAsync(command, new List<string> { "1" });
+            }
+
+            Thread.Sleep(10000);
+            command = new LightCommand()
+            {
+                On = lightState.On,
+                ColorCoordinates = lightState.ColorCoordinates
+            };
 
             hueClient.SendCommandAsync(command, new List<string> { "1" });
-
         }
 
         static async Task<LocalHueClient> GetClient()
