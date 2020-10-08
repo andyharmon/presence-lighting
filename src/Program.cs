@@ -108,12 +108,24 @@ namespace presence_lighting
             static void MonitorPresence()
             {
                 ConsoleKeyInfo cki;
+                string previousPresence = GetPresence(); // used to detect changes to presence
+                string currentPresence;
                 do
                 {
                     Console.WriteLine("\nDisplaying user presence, press the 'x' key to quit.");
+                    Console.WriteLine($"User is now {previousPresence}");
                     while (Console.KeyAvailable == false)
                     {
-                        Console.WriteLine($"User is currently {GetPresence()}");
+                        currentPresence = GetPresence();
+
+                        // if currentPresence is different to previousPresence,
+                        // tell the user and make changes in the Hue API
+
+                        if (currentPresence != previousPresence)
+                        {
+                            Console.WriteLine($"User is now {currentPresence}");
+                        }
+                        previousPresence = currentPresence;
                         Thread.Sleep(5000); // Loop every 5 second until input is entered.
                     }
 
