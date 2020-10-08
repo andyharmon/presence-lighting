@@ -1,5 +1,5 @@
 ﻿using presence_lighting.Authentication;
-using presence_lighting.Graph;
+using presence_lighting.Helpers;
 using System.Collections.Generic;
 using System;
 using Microsoft.Extensions.Configuration;
@@ -20,12 +20,17 @@ namespace presence_lighting
                 return;
             }
 
-            var appId = appConfig["appId"];
+            var azureAppId = appConfig["appId"];
             var scopesString = appConfig["scopes"];
             var scopes = scopesString.Split(";");
+            var hueAppId = appConfig["hueAppId"];
+            var hueBridgeIp = appConfig["hueBridgeIp"];
+
+            // Initialise the HueHelper
+            HueHelper.Initialise(hueAppId, hueBridgeIp);
 
             // initalise the auth provider with values from appsettings
-            var authProvider = new DeviceCodeAuthProvider(appId, scopes);
+            var authProvider = new DeviceCodeAuthProvider(azureAppId, scopes);
 
             // request a token to sign the user in
             var accessToken = authProvider.GetAccessToken().Result;
@@ -108,12 +113,10 @@ namespace presence_lighting
             static void MonitorPresence()
             {
                 ConsoleKeyInfo cki;
-                string previousPresence = GetPresence(); // used to detect changes to presence
+                string previousPresence = string.Empty; // used to detect changes to presence
                 string currentPresence;
                 do
                 {
-                    Console.WriteLine("\nDisplaying user presence, press the 'x' key to quit.");
-                    Console.WriteLine($"User is now {previousPresence}");
                     while (Console.KeyAvailable == false)
                     {
                         currentPresence = GetPresence();
@@ -124,6 +127,7 @@ namespace presence_lighting
                         if (currentPresence != previousPresence)
                         {
                             Console.WriteLine($"User is now {currentPresence}");
+                            HueHelper.UpdatePresence(currentPresence);
                         }
                         previousPresence = currentPresence;
                         Thread.Sleep(5000); // Loop every 5 second until input is entered.

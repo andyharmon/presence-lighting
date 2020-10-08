@@ -13,5 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="3.1.8" />
     <PackageReference Include="Microsoft.Graph.Beta" Version="0.28.0-preview" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.19.0" />
+    <PackageReference Include="Q42.HueApi" Version="3.15.7" />
+    <PackageReference Include="Q42.HueApi.ColorConverters" Version="3.14.0" />
   </ItemGroup>
 </Project>
