@@ -46,7 +46,7 @@ namespace presence_lighting.Helpers
                 hueClient.SendCommandAsync(command, new List<string> { "1" });
             }
 
-            if (presence == "Busy" || presence == "DoNotDisturb")
+            if (presence == "Busy" || presence == "DoNotDisturb" || presence == "InACall")
             {
                 command.TurnOn().SetColor(new RGBColor(TeamsRed));
                 hueClient.SendCommandAsync(command, new List<string> { "1" });
